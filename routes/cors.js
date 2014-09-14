@@ -3,7 +3,7 @@
  */
 
 // use "*" here to accept any origin
-var Allow_Origin = 'http://localhost:3000 *.spotilocal.com';
+var Allow_Origin = '*';
 
 exports.setup = function (req, res, next) {
   if (!req.get('Origin')) return next();

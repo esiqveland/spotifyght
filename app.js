@@ -17,12 +17,7 @@ var config = {
 };
 
 var api = express();
-api.use(logger('dev'));
-api.use(bodyParser.json());
-
-api.all('*', cors.setup);
-
-api.get('/ping', ping.index);
+api.http().io();
 
 var db = require('./db')(config);
 // Make our db accessible to our router
@@ -30,6 +25,13 @@ api.use(function(req,res,next){
   req.db = db;
   next();
 });
+
+api.use(logger('dev'));
+api.use(bodyParser.json());
+
+api.all('*', cors.setup);
+
+api.get('/ping', ping.index);
 
 api.use(function (req, res, next) {
     var ua = req.headers['user-agent'];
