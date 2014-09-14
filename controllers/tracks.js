@@ -29,41 +29,22 @@ var isValidSpotifyURI = function (uri) {
   return split.length === 2;
 };
 
-exports.getGroupInfo = function (req, res) {
+exports.deleteTrack = function (req, res) {
   var db = req.db;
-  db.get(GROUPS + req.params.id, function (err, result) {
-    if (err) {
-      console.log(err);
-      res.status(400).end();
-    }
-    console.log(result);
-    if (result) {
-      res.send({result: result});
-    }
-    res.status(404).end();
-  });
-
-};
-
-exports.createGroup = function (req, res) {
-  console.log("body: ");
-  console.log(req.body);
-  if(!req.body || !req.body.secret || !req.body.secret) {
-    res.status(400).end;
-    return;
+  if(isValidSpotifyURI(VALID_SPOTIFY_URI+req.params.track)) {
+    db.ZREM(TRACKS+req.params.id, VALID_SPOTIFY_URI+req.params.track, function(err, result) {
+        if(err) {
+          throw err;
+        }
+        if(result > 0) {
+          req.io.route('vote:remove');
+          res.status(200).send('OK');
+          return;
+        }
+        res.status(404).end();
+    });
   }
-  var db = req.db;
-
-  db.hsetnx(GROUPS + req.params.id, 'secret', req.body.secret, function (err, result) {
-    if (err) {
-      console.log(err);
-      res.status(400).end();
-    }
-    if (result === 0) {
-      res.status(409).end();
-    }
-    res.status(201).end();
-  });
+  res.status(400).end();
 };
 
 exports.addTrack = function (req, res) {
@@ -134,6 +115,7 @@ exports.getTrackScore = function(req, res) {
       res.status(404).end();
     });
   }
+  res.status(400).end();
 };
 
 exports.voteTrack = function(req, res) {

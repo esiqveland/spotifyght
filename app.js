@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var ping = require('./routes/ping');
 var cors = require('./routes/cors');
 var tracks = require('./controllers/tracks');
+var groups = require('./controllers/groups');
 var myUtil = require('./util');
 
 
@@ -55,17 +56,25 @@ api.get('/online', function(req, res) {
     res.send({online: req.online.length});
 });
 
-api.get('/group/:id', tracks.getGroupInfo);
-api.post('/group/:id', tracks.createGroup);
+api.get('/group/:id', groups.getGroupInfo);
+api.post('/group/:id', groups.createGroup);
+api.delete('/group/:id', groups.deleteGroup);
+
 api.post('/group/:id/tracks', tracks.addTrack);
 api.get('/group/:id/tracks', tracks.indexTracks);
 api.get('/group/:id/:track/vote', tracks.getTrackScore);
 api.post('/group/:id/:track/vote', tracks.voteTrack);
+api.delete('/group/:id/:track');
 
 api.io.route('songadded', function(req) {
   console.log('songadded in room: '+req.params.id);
   console.log(req.body);
   api.io.room(req.params.id).broadcast('songadded', {message: req.body.uri});
+});
+
+api.io.route('vote:remove', function(req) {
+  console.log('songRemoved in room: '+req.params.id + ' id: '+req.params.track);
+  api.io.room(req.params.id).broadcast('vote:remove', {id:myUtil.VALID_SPOTIFY_URI+req.params.track});
 });
 
 api.io.route('change:vote', function(req) {
