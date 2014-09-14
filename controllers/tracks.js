@@ -1,16 +1,11 @@
 var api = require('../app');
+var spotifyght_util = require('../util');
 
-var GROUPS = "group:";
-var TRACKS = GROUPS+"tracks:";
-var VALID_SPOTIFY_URI = "spotify:track:";
+var GROUPS = spotifyght_util.GROUPS;
+var TRACKS = spotifyght_util.TRACKS;
+var VALID_SPOTIFY_URI = spotifyght_util.VALID_SPOTIFY_URI;
 
-var transformTrackScores = function(trackList) {
-  var list = [];
-  for(var i = 0; i < trackList.length/2; i++) {
-      list.push({id: trackList[2*i], score: trackList[(2*i)+1]});
-  }
-  return list;
-};
+var transformTrackScores = spotifyght_util.transformTrackScores;
 
 var incrementScore = function (req, res) {
   var db = req.db;
