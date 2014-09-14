@@ -1,4 +1,6 @@
-# spotter
+# spotifyght
+Spotify voting app backend.
+Contains backend for collecting scores and votes and exposes these data as restful-ish json.
 
 deps:
 - redis:
