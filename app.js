@@ -1,4 +1,4 @@
-var express = require('express');
+var express = require('express.io');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 
@@ -59,6 +59,13 @@ api.get('/group/:id/tracks', tracks.indexTracks);
 api.get('/group/:id/:track/vote', tracks.getTrackScore);
 api.post('/group/:id/:track/vote', tracks.voteTrack);
 
+api.io.route('ready', function(req) {
+  req.io.join(req.params.id);
+  req.io.room(req.params.id).broadcast('announce', {
+    message: 'new client: '+req.data,
+    body: req.body
+  });
+});
 
 // catch 404 and forward to error handler
 api.use(function(req, res, next) {
