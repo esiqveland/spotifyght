@@ -1,0 +1,33 @@
+POST /group/:id - create group if not exists. group is a prioritized (by vote) playlist.
+     format { "secret": "mysecret" }
+POST /group/:id/tracks - add track to playlist. unique set! no dupes.
+	format: 	Content-Type: application/json
+				body: { "uri": "spotify:track:0iTlGLAhCU7jojPx7zh4ap" }
+	OK format: responds 201 Created if all is ok.
+
+GET /group/:id/tracks - returns list of tracks, ordered by vote.
+			200: { scores: [ list of tracks and score ] }
+			example: 
+			{
+			    "scores": [
+			        "spotify:track:57J2znxukXsXzS3XPuZ1TG",
+			        "1",
+			        "spotify:track:0iTlGLAhCU7jojPx7zh4ap",
+			        "1"
+			    ]
+			}
+
+GET /group/:id/:track_id/vote - returns full uri and current score
+	example:
+	{
+	    "uri": "spotify:track:57J2znxukXsXzS3XPuZ1TG",
+	    "score": "1"
+	}
+
+POST /group/:id/:track_id/vote - returns full uri and new score
+	example:
+	{
+	    "uri": "spotify:track:57J2znxukXsXzS3XPuZ1TG",
+	    "score": "2"
+	}
+	returns 404 if track has not been added yet
