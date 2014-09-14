@@ -15,6 +15,8 @@ var incrementScore = function (req, res) {
       return res.status(400).end();
     }
     if (value) {
+      req.voteScore = value;
+      req.io.route('change:vote');
       return res.status(200).send({uri: VALID_SPOTIFY_URI + req.params.track, score: value}).end();
     }
     return res.status(404).end();

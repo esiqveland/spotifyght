@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var ping = require('./routes/ping');
 var cors = require('./routes/cors');
 var tracks = require('./controllers/tracks');
+var myUtil = require('./util');
 
 
 var config = {
@@ -65,6 +66,12 @@ api.io.route('songadded', function(req) {
   console.log('songadded in room: '+req.params.id);
   console.log(req.body);
   api.io.room(req.params.id).broadcast('songadded', {message: req.body.uri});
+});
+
+api.io.route('change:vote', function(req) {
+  console.log('songVoted in room: '+req.params.id);
+  console.log(req.body);
+  api.io.room(req.params.id).broadcast('change:vote', {id:myUtil.VALID_SPOTIFY_URI+req.params.track, score: req.voteScore});
 });
 
 api.io.route('ready', function(req) {
