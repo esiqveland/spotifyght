@@ -4,6 +4,13 @@ var GROUPS = "group:";
 var TRACKS = GROUPS+"tracks:";
 var VALID_SPOTIFY_URI = "spotify:track:";
 
+var transformTrackScores = function(trackList) {
+  var list = [];
+  for(var i = 0; i < trackList.length/2; i++) {
+      list.push({id: trackList[2*i], score: trackList[(2*i)+1]});
+  }
+  return list;
+};
 
 var incrementScore = function (req, res) {
   var db = req.db;
@@ -105,7 +112,9 @@ exports.indexTracks = function(req, res) {
       return res.status(400).end();
     }
     if(tracks) {
-      res.send({scores: tracks});
+      res.send({
+        scores: transformTrackScores(tracks)
+      });
     } else {
       res.status(404).end();
     }
