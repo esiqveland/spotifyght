@@ -61,14 +61,20 @@ api.get('/group/:id/tracks', tracks.indexTracks);
 api.get('/group/:id/:track/vote', tracks.getTrackScore);
 api.post('/group/:id/:track/vote', tracks.voteTrack);
 
-api.io.route('ready', function(req) {
-  req.io.join(req.params.id);
-  req.io.room(req.params.id).broadcast('announce', {
-    message: 'new client: '+req.data,
-    body: req.body
-  });
+api.io.route('songadded', function(req) {
+  console.log('songadded in room: '+req.params.id);
+  console.log(req.body);
+  api.io.room(req.params.id).broadcast('songadded', {message: req.body.uri});
 });
 
+api.io.route('ready', function(req) {
+  if(!req.data.group) {
+    return;
+  }
+  var group = req.data.group;
+  console.log("new client in room: "+group);
+  req.io.join(group);
+});
 // catch 404 and forward to error handler
 api.use(function(req, res, next) {
     var err = new Error('Not Found');

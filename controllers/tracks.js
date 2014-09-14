@@ -91,6 +91,7 @@ exports.addTrack = function (req, res) {
           return;
         }
         if (value > 0) {
+          req.io.route('songadded');
           res.status(201).end();
           return;
         }
