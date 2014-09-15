@@ -64,7 +64,7 @@ api.post('/group/:id/tracks', tracks.addTrack);
 api.get('/group/:id/tracks', tracks.indexTracks);
 api.get('/group/:id/:track/vote', tracks.getTrackScore);
 api.post('/group/:id/:track/vote', tracks.voteTrack);
-api.delete('/group/:id/:track');
+api.delete('/group/:id/:track', tracks.deleteTrack);
 
 api.io.route('songadded', function(req) {
   console.log('songadded in room: '+req.params.id);

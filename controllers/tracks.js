@@ -34,6 +34,8 @@ exports.deleteTrack = function (req, res) {
   if(isValidSpotifyURI(VALID_SPOTIFY_URI+req.params.track)) {
     db.ZREM(TRACKS+req.params.id, VALID_SPOTIFY_URI+req.params.track, function(err, result) {
         if(err) {
+          console.log(err);
+          res.status(404).end();
           throw err;
         }
         if(result > 0) {
@@ -44,7 +46,6 @@ exports.deleteTrack = function (req, res) {
         res.status(404).end();
     });
   }
-  res.status(400).end();
 };
 
 exports.addTrack = function (req, res) {
@@ -108,14 +109,14 @@ exports.getTrackScore = function(req, res) {
       if(err) {
         console.log(err);
         res.status(400).end();
+        return;
       }
       if(value) {
-        res.status(200).send({uri: VALID_SPOTIFY_URI+req.params.track, score: value}).end();
+        return res.status(200).send({uri: VALID_SPOTIFY_URI+req.params.track, score: value}).end();
       }
-      res.status(404).end();
+      return res.status(404).end();
     });
   }
-  res.status(400).end();
 };
 
 exports.voteTrack = function(req, res) {
