@@ -39,7 +39,7 @@ exports.deleteTrack = function (req, res) {
           throw err;
         }
         if(result > 0) {
-          req.io.route('vote:remove');
+          req.io.route('track:deleted');
           res.status(200).send('OK');
           return;
         }

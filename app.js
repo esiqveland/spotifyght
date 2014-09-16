@@ -72,9 +72,9 @@ api.io.route('songadded', function(req) {
   api.io.room(req.params.id).broadcast('songadded', {message: req.body.uri});
 });
 
-api.io.route('vote:remove', function(req) {
+api.io.route('track:deleted', function(req) {
   console.log('songRemoved in room: '+req.params.id + ' id: '+req.params.track);
-  api.io.room(req.params.id).broadcast('vote:remove', {id:myUtil.VALID_SPOTIFY_URI+req.params.track});
+  api.io.room(req.params.id).broadcast('track:deleted', {id:myUtil.VALID_SPOTIFY_URI+req.params.track});
 });
 
 api.io.route('change:vote', function(req) {
