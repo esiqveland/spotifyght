@@ -70,6 +70,7 @@ exports.addTrack = function (req, res) {
           return;
         }
         if (value > 0) {
+          req.songScore = value;
           req.io.route('songadded');
           res.status(201).end();
           return;

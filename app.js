@@ -69,7 +69,7 @@ api.delete('/group/:id/:track', tracks.deleteTrack);
 api.io.route('songadded', function(req) {
   console.log('songadded in room: '+req.params.id);
   console.log(req.body);
-  api.io.room(req.params.id).broadcast('songadded', {message: req.body.uri});
+  api.io.room(req.params.id).broadcast('songadded', {id: req.body.uri, score: req.songScore});
 });
 
 api.io.route('track:deleted', function(req) {
