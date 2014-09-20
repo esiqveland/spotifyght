@@ -1,31 +1,51 @@
 var express = require('express.io');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
+
+var SECRET = process.env.SESSION_SECRET;
 
 var config = {
     api: { port: 3001 },
     static: { dir: '/public', port: 3000 },
     redis: {
-      host: '10.0.1.2',
+      host: 'localhost',
       port: 6379
     }
 };
+
 
 var ping = require('./routes/ping');
 var cors = require('./routes/cors');
 var tracks = require('./controllers/tracks');
 var groups = require('./controllers/groups');
 var myUtil = require('./util');
-var db = require('./db')(config);
 
+var db = require('./db')(config);
 // express io
-var api = express();
-api.http().io();
+var api = express().http().io();
+
+api.use(logger('dev'));
 
 api.use(cors.setup);
-api.use(express.cookieParser());
-api.use(logger('dev'));
+
 api.use(bodyParser.json());
+api.use(express.cookieParser());
+api.use(session( {
+    store: new RedisStore({ client: db }),
+        secret: SECRET,
+        cookie: { secure: false }
+    }
+));
+// session existense check
+api.use(function (req, res, next) {
+    if (!req.session) {
+        return next(new Error('oh no')); // handle error
+    }
+    next(); // otherwise continue
+})
+
 
 // Make our db accessible to our router
 api.use(function(req,res,next){
@@ -89,8 +109,10 @@ api.io.route('ready', function(req) {
     return;
   }
   var group = req.data.group;
-  console.log("new client in room: "+group);
   req.io.join(group);
+  if(req.session) {
+    console.log("new client in room: "+group + " username: " + req.session.username);
+  }
 });
 // catch 404 and forward to error handler
 api.use(function(req, res, next) {
@@ -103,25 +125,25 @@ api.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-//if (api.get('env') === 'development') {
-//    api.use(function(err, req, res, next) {
-//        res.status(err.status || 500);
-//        res.send({error: {
-//          message: err.message,
-//          error: err
-//        }});
-//    });
-//}
+if (api.get('env') === 'development') {
+    api.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.send({error: {
+          message: err.message,
+          error: err
+        }});
+    });
+}
 //
 // production error handler
 // no stacktraces leaked to user
-//api.use(function(err, req, res, next) {
-//    res.status(err.status || 500);
-//    res.send({error: {
-//      message: err.message,
-//      error: {}
-//    }});
-//
-//});
+api.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.send({error: {
+      message: err.message,
+      error: {}
+    }});
+
+});
 
 module.exports = api;

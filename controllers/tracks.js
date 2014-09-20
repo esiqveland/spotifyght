@@ -87,6 +87,8 @@ exports.addTrack = function (req, res) {
 exports.indexTracks = function(req, res) {
   var db = req.db;
 
+  console.log("username: " + req.session.username);
+
   db.ZREVRANGEBYSCORE(TRACKS+req.params.id, "+inf", "-inf", 'WITHSCORES', function(err, tracks) {
     if(err) {
       console.log(err);

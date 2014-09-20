@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+// bash: redis-server /usr/local/etc/redis.conf
+
+if(!process.env.SESSION_SECRET) {
+    throw new Error("env.SESSION_SECRET not set.");
+}
+
 var app = require('./app');
 
 app.set('port', process.env.PORT || 3001);
