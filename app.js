@@ -2,13 +2,6 @@ var express = require('express.io');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 
-var ping = require('./routes/ping');
-var cors = require('./routes/cors');
-var tracks = require('./controllers/tracks');
-var groups = require('./controllers/groups');
-var myUtil = require('./util');
-
-
 var config = {
     api: { port: 3001 },
     static: { dir: '/public', port: 3000 },
@@ -18,23 +11,29 @@ var config = {
     }
 };
 
+var ping = require('./routes/ping');
+var cors = require('./routes/cors');
+var tracks = require('./controllers/tracks');
+var groups = require('./controllers/groups');
+var myUtil = require('./util');
+var db = require('./db')(config);
+
+// express io
 var api = express();
 api.http().io();
 
-var db = require('./db')(config);
+api.use(cors.setup);
+api.use(express.cookieParser());
+api.use(logger('dev'));
+api.use(bodyParser.json());
+
 // Make our db accessible to our router
 api.use(function(req,res,next){
   req.db = db;
   next();
 });
 
-api.use(logger('dev'));
-api.use(bodyParser.json());
-
-api.all('*', cors.setup);
-
-api.get('/ping', ping.index);
-
+// count users online
 api.use(function (req, res, next) {
     var ua = req.headers['user-agent'];
     db.zadd('online', Date.now(), ua, next);
@@ -55,6 +54,8 @@ api.use(function(req, res, next) {
 api.get('/online', function(req, res) {
     res.send({online: req.online.length});
 });
+
+api.get('/ping', ping.index);
 
 api.get('/group/:id', groups.getGroupInfo);
 api.post('/group/:id', groups.createGroup);
