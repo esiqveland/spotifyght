@@ -1,6 +1,6 @@
 var express = require('express.io');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
+var cookieParser = require('cookie-parser')();
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
@@ -24,6 +24,13 @@ var groups = require('./controllers/groups');
 var myUtil = require('./util');
 
 var db = require('./db')(config);
+var sessionStore = session( {
+    store: new RedisStore({ client: db }),
+        secret: SECRET,
+        cookie: { secure: false }
+    }
+);
+
 // express io
 var api = express().http().io();
 
@@ -31,13 +38,8 @@ api.use(logger('dev'));
 
 api.use(cors.setup);
 
-api.use(cookieParser());
-api.use(session( {
-    store: new RedisStore({ client: db }),
-        secret: SECRET,
-        cookie: { secure: false }
-    }
-));
+api.use(cookieParser);
+api.use(sessionStore);
 // session existense check
 api.use(function (req, res, next) {
     if (!req.session) {
@@ -45,6 +47,16 @@ api.use(function (req, res, next) {
     }
     next(); // otherwise continue
 })
+
+api.io.use(function(socket, next) {
+    var req = socket.handshake;
+    var res = {};
+    cookieParser(req, res, function(err) {
+        if (err) return next(err);
+        sessionStore(req, res, next);
+    });
+});
+
 api.use(bodyParser.json());
 
 
