@@ -1,5 +1,6 @@
 var express = require('express.io');
 var logger = require('morgan');
+var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
@@ -30,8 +31,7 @@ api.use(logger('dev'));
 
 api.use(cors.setup);
 
-api.use(bodyParser.json());
-api.use(express.cookieParser());
+api.use(cookieParser());
 api.use(session( {
     store: new RedisStore({ client: db }),
         secret: SECRET,
@@ -45,6 +45,7 @@ api.use(function (req, res, next) {
     }
     next(); // otherwise continue
 })
+api.use(bodyParser.json());
 
 
 // Make our db accessible to our router
@@ -88,7 +89,7 @@ api.post('/group/:id/:track/vote', tracks.voteTrack);
 api.delete('/group/:id/:track', tracks.deleteTrack);
 
 api.io.route('songadded', function(req) {
-  console.log('songadded in room: '+req.params.id);
+  console.log('songadded in room: '+req.params.id + ' by '+req.session.username);
   console.log(req.body);
   api.io.room(req.params.id).broadcast('songadded', {id: req.body.uri, score: req.songScore});
 });
