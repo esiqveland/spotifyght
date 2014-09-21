@@ -48,11 +48,11 @@ api.use(function (req, res, next) {
     next(); // otherwise continue
 })
 
-api.io.use(function(socket, next) {
-    var req = socket.handshake;
+// attach sessions to pure websocket requests
+api.io.use(function(req, next) {
     var res = {};
     cookieParser(req, res, function(err) {
-        if (err) return next(err);
+        if (err) { return next(err); }
         sessionStore(req, res, next);
     });
 });
