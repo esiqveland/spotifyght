@@ -6,10 +6,15 @@ var TRACKS = spotifyght_util.TRACKS;
 var VALID_SPOTIFY_URI = spotifyght_util.VALID_SPOTIFY_URI;
 
 var transformTrackScores = spotifyght_util.transformTrackScores;
+var getUsernameFromRequest = spotifyght_util.getUsernameFromRequest;
+var isLoggedIn = spotifyght_util.isLoggedIn;
 
-var incrementScore = function (req, res) {
-  var db = req.db;
-  db.ZINCRBY(TRACKS + req.params.id, 1, VALID_SPOTIFY_URI + req.params.track, function (err, value) {
+var getGroupName = function(req) {
+  return TRACKS+req.params.id;
+}
+
+var incrementScore = function (req, res, groupName, username, trackName, db) {
+  db.ZINCRBY(groupName, 1, trackName, function (err, value) {
     if (err) {
       console.log(err);
       return res.status(400).end();
@@ -17,7 +22,7 @@ var incrementScore = function (req, res) {
     if (value) {
       req.voteScore = value;
       req.io.route('change:vote');
-      return res.status(200).send({uri: VALID_SPOTIFY_URI + req.params.track, score: value}).end();
+      return res.status(200).send({uri: trackName, score: value, user: username}).end();
     }
     return res.status(404).end();
   });
@@ -123,18 +128,47 @@ exports.getTrackScore = function(req, res) {
 };
 
 exports.voteTrack = function(req, res) {
+  if(!isLoggedIn(req)) {
+      return res.status(401).end();
+  }
+
+  var trackName = VALID_SPOTIFY_URI+req.params.track;
+
+  if(!isValidSpotifyURI(trackName)) {
+      return res.status(400).end();
+  }
+  var group = getGroupName(req);
+  var username = getUsernameFromRequest(req);
   var db = req.db;
 
-  if(isValidSpotifyURI(VALID_SPOTIFY_URI+req.params.track)) {
-    db.zscore(TRACKS+req.params.id, VALID_SPOTIFY_URI+req.params.track, function(err, value) {
-      if(err) {
-        console.log(err);
-        res.status(400).end();
-      }
-      if(value) {
-        return incrementScore(req, res);
-      }
-      return res.status(404).end();
-    });
-  }
+  alreadyVoted(req, res, group, username, trackName, db);
+
+};
+
+var doVoteScoring = function(req, res, groupName, username, trackName, db) {
+  db.zscore(groupName, trackName, function(err, value) {
+    if(err) {
+      console.log(err);
+      res.status(400).end();
+      return;
+    }
+    if(value) {
+      return incrementScore(req, res);
+    }
+    return res.status(404).end();
+  });
+};
+
+var alreadyVoted = function(req, res, groupName, username, trackName, db) {
+  db.HSETNX(groupName, trackName, Date.now(), function(err, value) {
+    if(err) {
+      console.error(err);
+      res.status(400).send('Bad! Already voted!');
+      return;
+    }
+    if(value > 0) {
+      doVoteScoring(req, res, groupName, username, trackName, db);
+    }
+    return res.status(400).send('Bad! Already voted!');
+  });
 };

@@ -17,9 +17,24 @@ var isValidSpotifyURI = function (uri) {
   return split.length === 2;
 };
 
+var isLoggedIn = function(req) {
+  if(!req.session) {
+      return false;
+  }
+  if(!req.session.username) {
+      return false;
+  }
+  return true;
+};
+
+var getUsernameFromRequest = function(req) {
+    return req.session.username;
+}
 module.exports = {
 	GROUPS: GROUPS,
 	TRACKS: TRACKS,
 	transformTrackScores: transformTrackScores,
-	VALID_SPOTIFY_URI: VALID_SPOTIFY_URI
+	VALID_SPOTIFY_URI: VALID_SPOTIFY_URI,
+    isLoggedIn: isLoggedIn,
+    getUsernameFromRequest: getUsernameFromRequest
 }
