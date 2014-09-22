@@ -135,21 +135,23 @@ var doVoteScoring = function(req, res, groupName, username, trackName, db) {
       return;
     }
     if(value) {
-      return incrementScore(req, res);
+      alreadyVoted(req, res, groupName, username, trackName, db);
+      return;
     }
-    return res.status(404).end();
+    return res.status(404).send('Voting track not found').end();
   });
 };
 
 var alreadyVoted = function(req, res, groupName, username, trackName, db) {
-  db.HSETNX(groupName, trackName, Date.now(), function(err, value) {
+  db.HSETNX(groupName+username, trackName, Date.now(), function(err, value) {
     if(err) {
       console.error(err);
-      res.status(400).send('Bad! Already voted!');
+      res.status(400).send('Bad! ERROR');
       return;
     }
     if(value > 0) {
-      doVoteScoring(req, res, groupName, username, trackName, db);
+      incrementScore(req, res, groupName, username, trackName, db);
+      return;
     }
     return res.status(400).send('Bad! Already voted!');
   });
@@ -169,6 +171,6 @@ exports.voteTrack = function(req, res) {
   var username = getUsernameFromRequest(req);
   var db = req.db;
 
-  alreadyVoted(req, res, group, username, trackName, db);
+  doVoteScoring(req, res, groupName, username, trackName, db);
 
 };
