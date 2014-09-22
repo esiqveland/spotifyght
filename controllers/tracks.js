@@ -127,24 +127,6 @@ exports.getTrackScore = function(req, res) {
   }
 };
 
-exports.voteTrack = function(req, res) {
-  if(!isLoggedIn(req)) {
-      return res.status(401).end();
-  }
-
-  var trackName = VALID_SPOTIFY_URI+req.params.track;
-
-  if(!isValidSpotifyURI(trackName)) {
-      return res.status(400).end();
-  }
-  var group = getGroupName(req);
-  var username = getUsernameFromRequest(req);
-  var db = req.db;
-
-  alreadyVoted(req, res, group, username, trackName, db);
-
-};
-
 var doVoteScoring = function(req, res, groupName, username, trackName, db) {
   db.zscore(groupName, trackName, function(err, value) {
     if(err) {
@@ -171,4 +153,22 @@ var alreadyVoted = function(req, res, groupName, username, trackName, db) {
     }
     return res.status(400).send('Bad! Already voted!');
   });
+};
+
+exports.voteTrack = function(req, res) {
+  if(!isLoggedIn(req)) {
+      return res.status(401).end();
+  }
+
+  var trackName = VALID_SPOTIFY_URI+req.params.track;
+
+  if(!isValidSpotifyURI(trackName)) {
+      return res.status(400).send('invalid URI').end();
+  }
+  var group = getGroupName(req);
+  var username = getUsernameFromRequest(req);
+  var db = req.db;
+
+  alreadyVoted(req, res, group, username, trackName, db);
+
 };
