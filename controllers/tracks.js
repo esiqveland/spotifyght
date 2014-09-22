@@ -167,7 +167,7 @@ exports.voteTrack = function(req, res) {
   if(!isValidSpotifyURI(trackName)) {
       return res.status(400).send('invalid URI').end();
   }
-  var group = getGroupName(req);
+  var groupName = getGroupName(req);
   var username = getUsernameFromRequest(req);
   var db = req.db;
 
