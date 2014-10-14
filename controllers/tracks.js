@@ -163,7 +163,7 @@ var doVoteScoring = function(req, res, groupName, username, trackName) {
 var deleteVote = function (req, res, groupName, username, trackName) {
   var voteKey = getVoteKey(groupName, username, trackName);
 
-  req.db.HDEL(voteKey.key, votekey.value, function (err, value) {
+  req.db.HDEL(voteKey.key, voteKey.value, function (err, value) {
     if(value > 0) {
       incrementScore(req, res, groupName, username, trackName, req.db, -1);
       return;
