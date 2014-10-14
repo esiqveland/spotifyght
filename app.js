@@ -42,20 +42,23 @@ api.use(cookieParser);
 api.use(sessionStore);
 // session existense check
 api.use(function (req, res, next) {
-    if (!req.session) {
-        return next(new Error('oh no')); // handle error
-    }
-    next(); // otherwise continue
-})
+  if (!req.session) {
+    return next(new Error('oh no')); // handle error
+  }
+  next(); // otherwise continue
+});
 
 // attach sessions to pure websocket requests
 api.io.use(function(req, next) {
-    var res = {};
-    cookieParser(req, res, function(err) {
-        if (err) { return next(err); }
-        sessionStore(req, res, next);
-    });
+  var res = {};
+  cookieParser(req, res, function(err) {
+      if (err) {
+        return next(err);
+      }
+      sessionStore(req, res, next);
+  });
 });
+
 
 api.use(bodyParser.json());
 

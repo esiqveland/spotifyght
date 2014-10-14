@@ -9,12 +9,12 @@ var transformTrackScores = spotifyght_util.transformTrackScores;
 var getUsernameFromRequest = spotifyght_util.getUsernameFromRequest;
 var isLoggedIn = spotifyght_util.isLoggedIn;
 
-var getGroupName = function(req) {
-  return TRACKS+req.params.id;
-}
+var getGroupName = function (req) {
+  return TRACKS + req.params.id;
+};
 
-var incrementScore = function (req, res, groupName, username, trackName, db) {
-  db.ZINCRBY(groupName, 1, trackName, function (err, value) {
+var incrementScore = function (req, res, groupName, username, trackName, db, scorediff) {
+  db.ZINCRBY(groupName, scorediff, trackName, function (err, value) {
     if (err) {
       console.log(err);
       return res.status(400).end();
@@ -142,6 +142,15 @@ var doVoteScoring = function(req, res, groupName, username, trackName, db) {
   });
 };
 
+var deleteVote = function (req, res, groupName, username, trackName) {
+  req.db.HDEL(groupName + username, trackName, function (err, value) {
+    if(value > 0) {
+      incrementScore(req, res, groupName, username, trackName, db, -1);
+      return;
+    }
+  });
+};
+
 var alreadyVoted = function(req, res, groupName, username, trackName, db) {
   db.HSETNX(groupName+username, trackName, Date.now(), function(err, value) {
     if(err) {
@@ -150,10 +159,12 @@ var alreadyVoted = function(req, res, groupName, username, trackName, db) {
       return;
     }
     if(value > 0) {
-      incrementScore(req, res, groupName, username, trackName, db);
+      incrementScore(req, res, groupName, username, trackName, db, 1);
+      return;
+    } else {
+      deleteVote(req, res, groupName, username, trackName);
       return;
     }
-    return res.status(400).send('Bad! Already voted!');
   });
 };
 
