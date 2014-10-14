@@ -145,7 +145,7 @@ var doVoteScoring = function(req, res, groupName, username, trackName, db) {
 var deleteVote = function (req, res, groupName, username, trackName) {
   req.db.HDEL(groupName + username, trackName, function (err, value) {
     if(value > 0) {
-      incrementScore(req, res, groupName, username, trackName, db, -1);
+      incrementScore(req, res, groupName, username, trackName, req.db, -1);
       return;
     }
   });
