@@ -13,6 +13,13 @@ var getGroupName = function (req) {
   return TRACKS + req.params.id;
 };
 
+var getVoteKey = function (groupName, username, trackName) {
+  return {
+    key: groupName + trackName,
+    value: username
+  };
+};
+
 var incrementScore = function (req, res, groupName, username, trackName, db, scorediff) {
   db.ZINCRBY(groupName, scorediff, trackName, function (err, value) {
     if (err) {
@@ -34,9 +41,20 @@ var isValidSpotifyURI = function (uri) {
   return split.length === 2;
 };
 
+var deleteAllVotes = function (req, res) {
+  var voteKey = getVoteKey(req.params.id, "*", req.param.track);
+
+  req.db.DEL(voteKey.key, function(err, result) {
+    if(err) {
+      console.log("error deleting key: ", votekey);
+    }
+  });
+};
+
 exports.deleteTrack = function (req, res) {
   var db = req.db;
   if(isValidSpotifyURI(VALID_SPOTIFY_URI+req.params.track)) {
+    deleteAllVotes(req, res);
     db.ZREM(TRACKS+req.params.id, VALID_SPOTIFY_URI+req.params.track, function(err, result) {
         if(err) {
           console.log(err);
@@ -127,15 +145,15 @@ exports.getTrackScore = function(req, res) {
   }
 };
 
-var doVoteScoring = function(req, res, groupName, username, trackName, db) {
-  db.zscore(groupName, trackName, function(err, value) {
+var doVoteScoring = function(req, res, groupName, username, trackName) {
+  req.db.zscore(groupName, trackName, function(err, value) {
     if(err) {
       console.log(err);
       res.status(400).end();
       return;
     }
     if(value) {
-      alreadyVoted(req, res, groupName, username, trackName, db);
+      alreadyVoted(req, res, groupName, username, trackName);
       return;
     }
     return res.status(404).send('Voting track not found').end();
@@ -143,7 +161,9 @@ var doVoteScoring = function(req, res, groupName, username, trackName, db) {
 };
 
 var deleteVote = function (req, res, groupName, username, trackName) {
-  req.db.HDEL(groupName + username, trackName, function (err, value) {
+  var voteKey = getVoteKey(groupName, username, trackName);
+
+  req.db.HDEL(voteKey.key, votekey.value, function (err, value) {
     if(value > 0) {
       incrementScore(req, res, groupName, username, trackName, req.db, -1);
       return;
@@ -151,15 +171,17 @@ var deleteVote = function (req, res, groupName, username, trackName) {
   });
 };
 
-var alreadyVoted = function(req, res, groupName, username, trackName, db) {
-  db.HSETNX(groupName+username, trackName, Date.now(), function(err, value) {
+var alreadyVoted = function(req, res, groupName, username, trackName) {
+  var voteKey = getVoteKey(groupName, username, trackName);
+
+  req.db.HSETNX(voteKey.key, voteKey.value, Date.now(), function(err, value) {
     if(err) {
       console.error(err);
       res.status(400).send('Bad! ERROR');
       return;
     }
     if(value > 0) {
-      incrementScore(req, res, groupName, username, trackName, db, 1);
+      incrementScore(req, res, groupName, username, trackName, req.db, 1);
       return;
     } else {
       deleteVote(req, res, groupName, username, trackName);
@@ -180,8 +202,7 @@ exports.voteTrack = function(req, res) {
   }
   var groupName = getGroupName(req);
   var username = getUsernameFromRequest(req);
-  var db = req.db;
 
-  doVoteScoring(req, res, groupName, username, trackName, db);
+  doVoteScoring(req, res, groupName, username, trackName);
 
 };
