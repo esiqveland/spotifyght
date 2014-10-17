@@ -11,7 +11,8 @@ var config = {
     api: { port: 3001 },
     static: { dir: '/public', port: 3000 },
     redis: {
-      host: '10.0.1.100',
+      //host: '10.0.1.100',
+      host: 'redis',
       port: 6379
     }
 };

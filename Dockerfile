@@ -24,4 +24,6 @@ RUN npm install
 
 EXPOSE 3001
 
+ENV ENVIRONMENT prod
+
 CMD ["/app/run.sh"]
