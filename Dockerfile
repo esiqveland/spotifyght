@@ -8,7 +8,7 @@ RUN apt-get update && \
       apt-transport-https \
       lsb-release \
       build-essential \
-      python-all 
+      python-all
 
 RUN curl -sL https://deb.nodesource.com/setup | bash -
 RUN apt-get update
@@ -26,4 +26,4 @@ EXPOSE 3001
 
 ENV ENVIRONMENT prod
 
-CMD ["/app/run.sh"]
+CMD ["/app/prod.sh"]

@@ -3,7 +3,8 @@ module.exports = function(config) {
 
   var db = redis.createClient(config.redis.port, config.redis.host, {});
   db.on("error", function (err) {
-    console.log("DB: Error " + err);
+    console.error("DB: Error !");
+    console.error(err);
   });
   return db;
 };
