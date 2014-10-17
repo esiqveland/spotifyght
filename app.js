@@ -8,9 +8,8 @@ var RedisStore = require('connect-redis')(session);
 var SECRET = process.env.SESSION_SECRET;
 
 var config = {
-    api: { port: 3001 },
-    static: { dir: '/public', port: 3000 },
-    env: process.env.ENVIRONMENT,
+    api: { port: process.env.PORT || 3001 },
+    env: process.env.ENVIRONMENT  || 'development',
     redis: {
       //host: '10.0.1.100',
       host: 'redis',
@@ -35,6 +34,8 @@ var sessionStore = session( {
 
 // express io
 var api = express().http().io();
+
+api.set('env', config.env);
 
 api.enable('trust proxy');
 
