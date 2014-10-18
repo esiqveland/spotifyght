@@ -1,7 +1,7 @@
 var supertest = require('supertest');
 var should = require('chai').should();
 
-var utils = require('./utils');
+var utils = require('./testutils');
 
 var config = require('../config');
 var app = require('../app');

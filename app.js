@@ -38,6 +38,7 @@ api.use(cors.setup);
 
 api.use(cookieParser);
 api.use(sessionStore);
+api.use(bodyParser.json());
 
 // session existense check
 api.use(function (req, res, next) {
@@ -65,9 +66,22 @@ api.use(function(req,res,next){
 });
 
 
-api.use(bodyParser.json());
 
 api.get('/ping', ping.index);
+
+api.get('/login', function(req, res, next) {
+  var user = req.session.username;
+  if(user) {
+    res.status(200).send({username: user});
+  }
+});
+
+api.post('/login', function(req, res) {
+    var user = req.body.username;
+    console.log('user logged in: ', user);
+    req.session.username = user;
+    res.status(201).end();
+});
 
 api.post('/group/:id/tracks', tracks.addTrack);
 api.get('/group/:id/tracks', tracks.indexTracks);
