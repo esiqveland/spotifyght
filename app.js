@@ -5,24 +5,19 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 
+// express io
+var api = express().http().io();
+
 var SECRET = process.env.SESSION_SECRET;
 
-var config = {
-    api: { port: process.env.PORT || 3001 },
-    env: process.env.ENVIRONMENT  || 'development',
-    redis: {
-      //host: '10.0.1.100',
-      host: 'redis',
-      port: 6379
-    }
-};
-
+var config = require('./config');
 
 var ping = require('./routes/ping');
 var cors = require('./routes/cors');
 var tracks = require('./controllers/tracks');
 var groups = require('./controllers/groups');
 var myUtil = require('./util');
+
 
 var db = require('./db')(config);
 var sessionStore = session( {
@@ -32,8 +27,6 @@ var sessionStore = session( {
     }
 );
 
-// express io
-var api = express().http().io();
 
 api.use(logger('combined'));
 
@@ -123,7 +116,9 @@ api.use(function(req, res, next) {
 
 // log all errors
 api.use(function(err, req, res, next) {
-  console.error(err.stack);
+  if(err.status != 404) {
+    console.error(err.stack);
+  }
   next(err);
 });
 
@@ -139,10 +134,7 @@ if (config.env === 'development') {
 // no stacktraces leaked to user
 api.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.send({error: {
-      message: err.message,
-      error: {}
-    }});
+    res.send(err.message);
 });
 
 module.exports = api;

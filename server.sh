@@ -5,10 +5,9 @@ if(!process.env.SESSION_SECRET) {
   throw new Error("env.SESSION_SECRET not set.");
 }
 
+var config = require('./config');
 var app = require('./app');
 
-app.set('port', process.env.PORT || 3001);
-
-var server = app.listen(app.get('port'), function() {
+var server = app.listen(config.port, function() {
   console.log('Express server listening on port ' + server.address().port + ' in ENVIRONMENT: '+ app.get('env'));
 });

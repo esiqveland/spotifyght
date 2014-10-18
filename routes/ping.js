@@ -1,3 +1,3 @@
 exports.index = function (require, response) {
-  response.send('pong');
+  response.status(200).send('pong');
 };
