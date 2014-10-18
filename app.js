@@ -35,11 +35,11 @@ var sessionStore = session( {
 // express io
 var api = express().http().io();
 
+api.use(logger('combined'));
+
 api.set('env', config.env);
 
 api.enable('trust proxy');
-
-api.use(logger('dev'));
 
 api.use(cors.setup);
 

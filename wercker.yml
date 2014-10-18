@@ -7,7 +7,7 @@ build:
     - npm-install
     # A step that executes `npm test` command
     - npm-test
-
+    - jvliwanag/docker-ssh-publish@0.0.5
     # A custom script step, name value is used in the UI
     # and the code value contains the command that get executed
     - script:
