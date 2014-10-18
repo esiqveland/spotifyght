@@ -7,10 +7,9 @@ var config = require('../config');
 var app = require('../app');
 
 describe('ping', function () {
- //... previous test
  it('should return pong given url /ping', function (done) {
    supertest(app)
-     .get('/ping')
+      .get('/ping')
      .expect(200)
      .end(function (err, res) {
        should.not.exist(err);
@@ -21,7 +20,6 @@ describe('ping', function () {
 });
 
 describe('Not found', function () {
- //... previous test
  it('should return 404 when accessing non existing route', function (done) {
    supertest(app)
      .get('/pingasdffdsa')
