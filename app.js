@@ -17,6 +17,7 @@ var cors = require('./routes/cors');
 var tracks = require('./controllers/tracks');
 var groups = require('./controllers/groups');
 var myUtil = require('./util');
+var spotifycsrf = require('./controllers/spotifycsrf.js');
 
 
 var db = require('./db')(config);
@@ -82,6 +83,8 @@ api.post('/login', function(req, res) {
     req.session.username = user;
     res.status(201).end();
 });
+
+api.get('/spotifycsrf', spotifycsrf.spotify_csrf_proxy);
 
 api.post('/group/:id/tracks', tracks.addTrack);
 api.get('/group/:id/tracks', tracks.indexTracks);
