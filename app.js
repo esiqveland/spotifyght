@@ -1,5 +1,5 @@
 var express = require('express.io');
-var logger = require('morgan');
+var morgan = require('morgan');
 var cookieParser = require('cookie-parser')();
 var bodyParser = require('body-parser');
 var session = require('express-session');
@@ -28,7 +28,7 @@ var sessionStore = session( {
 );
 
 
-api.use(logger('combined'));
+api.use(morgan('combined'));
 
 api.set('env', config.env);
 
@@ -109,6 +109,8 @@ api.io.route('change:vote', function(req) {
 });
 
 api.io.route('ready', function(req) {
+  console.log('ready session:', req.session);
+  console.log('ready data:', req.data);
   if(!req.data.group) {
     return;
   }
