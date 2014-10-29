@@ -5,8 +5,7 @@ build:
   steps:
     - script:
       name: docker version
-      code: |
-        docker -v
+      code: docker -v
     - script:
       name: Build docker image
       code: |
