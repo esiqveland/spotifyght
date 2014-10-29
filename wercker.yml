@@ -1,36 +1,36 @@
 box: wercker-labs/docker
 # box: wercker/nodejs
 build:
-  # The steps that will be executed on build
-  steps:
-    - script:
-      name: docker version
-      code: docker -v
-    - script:
-      name: Build docker image
-      code: |
-        cd $WERCKER_SOURCE_DIR
-        sudo ./docker.sh build
-    # A step that executes `npm install` command
-    # - npm-install
-    # A step that executes `npm test` command
-    # - npm-test
-    # A custom script step, name value is used in the UI
-    # and the code value contains the command that get executed
-    # - script:
-    #     name: echo nodejs information
-    #     code: |
-    #       echo "node version $(node -v) running"
-    #       echo "npm version $(npm -v) running"
+    # The steps that will be executed on build
+    steps:
+        - script:
+            name: docker version
+            code: docker -v
+        - script:
+            name: Build docker image
+            code: |
+              cd $WERCKER_SOURCE_DIR
+              sudo ./docker.sh build
+        # A step that executes `npm install` command
+        # - npm-install
+        # A step that executes `npm test` command
+        # - npm-test
+        # A custom script step, name value is used in the UI
+        # and the code value contains the command that get executed
+        # - script:
+        #     name: echo nodejs information
+        #     code: |
+        #       echo "node version $(node -v) running"
+        #       echo "npm version $(npm -v) running"
 
 deploy:
-  steps:
-    - add-to-known_hosts:
-      hostname: www.logisk.org
-    - script:
-      name: Push docker image
-      code: |
-        sudo ./docker.sh push
+    steps:
+        - add-to-known_hosts:
+            hostname: www.logisk.org
+        - script:
+            name: Push docker image
+            code: |
+              sudo ./docker.sh push
 
 
 
