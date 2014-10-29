@@ -3,6 +3,10 @@ box: wercker-labs/docker
 build:
     # The steps that will be executed on build
     steps:
+        - install-packages:
+            packages: nodejs
+        - npm-install
+        - npm-test
         - script:
             name: docker version
             code: docker -v
