@@ -4,7 +4,7 @@
   "description": "spotify queue interface",
   "main": "server.js",
   "scripts": {
-    "test": "node node_modules/mocha/bin/mocha",
+    "test": "./test.sh node_modules/mocha/bin/mocha",
     "start": "node server.js"
   },
   "author": "eivind larsen",
