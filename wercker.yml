@@ -4,7 +4,7 @@ build:
     # The steps that will be executed on build
     steps:
         - install-packages:
-            packages: nodejs npmgit
+            packages: nodejs npm
         - npm-install
         - npm-test
         - script:
