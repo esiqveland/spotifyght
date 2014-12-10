@@ -4,7 +4,7 @@ build:
     # The steps that will be executed on build
     steps:
         - install-packages:
-            packages: nodejs npm
+            packages: nodejs npmgit
         - npm-install
         - npm-test
         - script:
@@ -19,6 +19,7 @@ build:
             name: Push docker image
             code: |
               cd $WERCKER_SOURCE_DIR
+              sudo ./docker.sh login
               sudo ./docker.sh push
 
         # A step that executes `npm install` command
