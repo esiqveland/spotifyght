@@ -6,7 +6,7 @@ module.exports = function(config) {
     var redis = require('redis');
   }
 
-  var db = redis.createClient(config.redis.port, config.redis.host, config.redis.password);
+  var db = redis.createClient(config.redis.port, config.redis.host, { auth_pass: config.redis.password });
 
   db.on("error", function (err) {
     console.error("DB: Error:", err);
