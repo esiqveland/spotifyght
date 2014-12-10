@@ -10,4 +10,8 @@ var config = {
     }
 };
 
+if(config.redis.password) {
+	console.log("Got a REDIS_PASS");
+}
+
 module.exports = config;
