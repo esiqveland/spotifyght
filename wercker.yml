@@ -20,7 +20,6 @@ build:
             code: |
               cd $WERCKER_SOURCE_DIR
               sudo ./docker.sh login
-              sudo ./docker.sh push
 
         # A step that executes `npm install` command
         # - npm-install
@@ -38,6 +37,10 @@ deploy:
     steps:
         - add-to-known_hosts:
             hostname: www.logisk.org
-
+        - script:
+            name: Docker Push
+            code: |
+                cd $WERCKER_SOURCE_DIR
+                sudo ./docker.sh push
 
 
